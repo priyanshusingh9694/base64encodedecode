@@ -32,11 +32,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 func viewCodeHandler(w http.ResponseWriter, r *http.Request) {
 	dataString := r.FormValue("dataString")
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(dataString))
-	m, _, err := image.Decode(reader)
+	m, fileType, err := image.Decode(reader)
 	if err != nil {
 		fmt.Println(err)
 	}
-	png.Encode(w, m)
+
+	switch fileType {
+	case "jpeg":
+		jpeg.Encode(w, m, &jpeg.Options{95})
+	default:
+		png.Encode(w, m)
+	}
 }
 
 func toBase64(b []byte) string {
